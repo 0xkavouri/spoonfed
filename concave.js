@@ -40,15 +40,13 @@ var options = {
 };
 
 let process = async (context, data) => {
-	let parsed = await Promise.all(data.map(async (log) => {
+	return Promise.all(data.map(async (log) => {
         let index = log.returnValues.index / 1E9;
         let rebasePercent = log.returnValues.rebase / 1E18;
 		let supply = await getSupplyAtBlock(log.blockNumber, context.tokenContract);
         let stakedAmount = await getStakedAmount(log.blockNumber, context.tokenContract, context.stakingAddress);
         supply = supply / 1E9;
         let growth = 1 + ((supply - context.initialSupply) / context.initialSupply);
-        if (context.name == 'spartacus')
-            console.log(supply, index);
 		return {
 			'blockNumber': log.blockNumber,
 			'index': index,
@@ -59,12 +57,13 @@ let process = async (context, data) => {
             'rebase': rebasePercent,
             'apy': 100 * ((1 + rebasePercent) ** 1095)
 		};
-	}))
+	})).then((parsed) => parsed.filter((val) => val.supply > context.initialSupply && val.index > context.initialIndex))
+       .then(filtered => { 
+            if (filtered.length > 0) {
+                writeToCsv(filtered, `${OUTPUT_DIR}/${context.name}.csv`);
+            }
+       });
 
-    parsed = parsed.filter((val) => val.supply > context.initialSupply && val.index > context.initialIndex);
-    if (parsed.length == 0) return;
-
-	writeToCsv(parsed, `${OUTPUT_DIR}/${context.name}.csv`);
 }
 
 let getData = async (context, startBlock, endBlock) => { 
@@ -76,14 +75,55 @@ let getData = async (context, startBlock, endBlock) => {
     if (startBlock > endBlock) return;
     let data = await context.stakeTokenContract.getPastEvents('LogRebase', {
         fromBlock: startBlock, 
-        toBlock: Math.min(endBlock, startBlock + 1E5) 
+        toBlock: Math.min(endBlock, startBlock + context.step) 
     }) 
 
 
-    process(context, data);
-    getData(context, startBlock + context.step, endBlock);
+    return process(context, data).then(() => getData(context, startBlock + context.step, endBlock));
 }
 
+let getBondData = async (context, bond) => {
+    if (!bond) return;
+    console.log(context.name, bond.name);
+
+    let startBlock = context.startBlock;
+    let endBlock = context.endBlock;
+    let results = [];
+    let promises = [];
+    let bondContract = bond.contract;
+
+    while (startBlock < endBlock) {
+       promises.push(bondContract.getPastEvents('ControlVariableAdjustment', {
+           fromBlock: startBlock, 
+           toBlock: Math.min(startBlock + context.step, endBlock) 
+       })
+       .then(data => data.filter((res) => !!res))
+       .then(data => data.forEach(async (res) => 
+            results.push({
+                "block": res.blockNumber,
+                "bcv": res.returnValues.newBCV, 
+                "timestamp": (await context.web3.eth.getBlock(res.blockNumber)).timestamp
+            }))));
+        startBlock += context.step;
+    }
+
+    return Promise.all(promises)
+            .then(() => results.sort((a,b) => parseInt(a.block) - parseInt(b.block)))
+            .then(data => { writeBondToCsv(data, context.name, bond.name); return data;}); 
+}
+
+let writeBondToCsv = (rows, token, name) => {
+	const csvWriter = createObjectCsvWriter.createObjectCsvWriter({
+		'path': `${OUTPUT_DIR}/${token}_${name}_bond.csv`,
+		'header':  [
+            {'id': 'block', 'title': 'block'},
+            {'id': 'bcv', 'title': 'bcv'},
+            {'id': 'timestamp', "title": 'timestamp'},
+        ]
+	});
+
+	csvWriter.writeRecords(rows);
+}
 
 let writeToCsv = (rows, name) => {
 	const csvWriter = createObjectCsvWriter.createObjectCsvWriter({
@@ -112,21 +152,33 @@ let getStakedAmount = async (block, tokenContract, stakingContract) => {
     return tokenContract.methods.balanceOf(stakingContract).call(undefined, block);
 }
 
-
 let main = () => {
     parseConfig();
-    config.chains.forEach((chain) => {
+    config.chains.forEach(async (chain) => {
         if (chain.skip) return;
         let web3 = new Web3(chain.endpoint, options);
         Contract.setProvider(web3);
 
-        chain.tokens.forEach(async (token) => {
-            let stakedAbi = JSON.parse(fs.readFileSync(config.abiDir + token.stakedTokenAbi, 'utf8'));
-            let stakingAbi = JSON.parse(fs.readFileSync('./' + token.stakingAbi, 'utf8'));
-            let tokenAbi = JSON.parse(fs.readFileSync('./' + token.tokenAbi, 'utf8'));
+        let contexts = chain.tokens.map((token) => {
+            let stakedAbi = JSON.parse(fs.readFileSync(`${config.abiDir}/${token.stakedTokenAbi}`, 'utf8'));
+            let stakingAbi = JSON.parse(fs.readFileSync(`${config.abiDir}/${token.stakingAbi}`, 'utf8'));
+            let tokenAbi = JSON.parse(fs.readFileSync(`${config.abiDir}/${token.tokenAbi}`, 'utf8'));
             let stakeTokenContract = new Contract(stakedAbi, token.stakeTokenAddress);
             let tokenContract = new Contract(tokenAbi, token.tokenAddress);
             let stakingContract = new Contract(stakingAbi, token.stakingAddress);
+
+            let bondAbi;
+            let bondContract;
+
+            let bonds = [];
+            if (token.bonds) {
+                bondAbi = JSON.parse(fs.readFileSync(`${config.abiDir}/${token.bondAbi}`, 'utf8'));
+                token.bonds.forEach(bond => {
+                    bondContract = new Contract(bondAbi, bond.address);
+                    bonds.push({'name': bond.name, 'contract': bondContract});
+                }); 
+            }
+
             let context = {
                 name: token.name,
                 web3: web3,
@@ -139,11 +191,22 @@ let main = () => {
                 initialSupply: token.initialSupply,
                 stakingContract: stakingContract,
                 stakingAddress: token.stakingAddress,
-                initialIndex: token.initialIndex
+                bondContract: bondContract,
+                initialIndex: token.initialIndex,
+                bonds: bonds
             };
 
-            getData(context);
+            return context;
         });
+
+        for (let i = 0; i < contexts.length; i++) {
+            console.log('Fetching data for ' + contexts[i].name);
+            let context = contexts[i];
+            let bonds = context.bonds;
+            let bondPromises = bonds.map(bond => getBondData(context, bond));
+            let bondData = await Promise.all(bondPromises);
+            let data = await getData(context);
+        }
     })
 
 }

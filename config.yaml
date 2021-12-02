@@ -2,22 +2,28 @@ abiDir: './abis'
 outputDir: './data'
 chains:
     - 
-        skip: true
         name: 'avax'
         endpoint: "https://api.avax.network/ext/bc/C/rpc"
-        step: 1E5
+        step: 5E5
         tokens: 
           -
               name: "time"
               tokenAddress: '0xb54f16fb19478766a268f172c9480f8da1a7c9c3'
               stakeTokenAddress: '0x136acd46c134e8269052c62a67042d6bdedde3c9'
               stakingAddress: '0x4456B87Af11e87E329AB7d7C7A246ed1aC2168B9'
+              bonds: 
+                - 
+                  name: 'mim'
+                  address: '0xE02B1AA2c4BE73093BE79d763fdFFC0E3cf67318'
+                - 
+                  name: 'avax'
+                  address: '0xA184AE1A71EcAD20E822cB965b99c287590c4FFe'
               startBlock: 3775251 
               endBlock: 7690892
               tokenAbi: "time.json"
               stakedTokenAbi: "memo.json"
               stakingAbi: "timeStaking.json"
-              step: 1E5
+              bondAbi: "timeBond.json"
               initialSupply: 30000
               initialIndex: 4.547419269
           -
@@ -35,7 +41,7 @@ chains:
     - 
         name: 'fantom'
         endpoint: "https://rpc.ftm.tools"
-        step: 1E5
+        step: 5E5
         tokens: 
           -
               name: "hector"
@@ -47,7 +53,6 @@ chains:
               tokenAbi: "hector.json"
               stakedTokenAbi: "shector.json"
               stakingAbi: "hectorStaking.json"
-              step: 1E5
               initialSupply: 274655
               initialIndex: 1.580730335 
           -
@@ -60,6 +65,18 @@ chains:
               tokenAbi: "spartacus.json"
               stakedTokenAbi: "sspartacus.json"
               stakingAbi: "spartacusStaking.json"
-              step: 1E5
               initialSupply: 43383.384648235
               initialIndex: 7.67521082 
+
+          -
+              name: "exodia"
+              tokenAddress: '0x3b57f3feaaf1e8254ec680275ee6e7727c7413c7'
+              stakeTokenAddress: '0x8de250C65636Ef02a75e4999890c91cECd38D03D'
+              stakingAddress: '0x8b8d40f98a2f14E2dD972b3f2E2a2CC227d1E3Be'
+              startBlock: 20057550
+              endBlock: 23790712
+              tokenAbi: "exodia.json"
+              stakedTokenAbi: "sexodia.json"
+              stakingAbi: "exodiaStaking.json"
+              initialSupply: 2346 
+              initialIndex: 1 
