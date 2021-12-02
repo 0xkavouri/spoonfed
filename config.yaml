@@ -1,0 +1,65 @@
+abiDir: '/abi'
+outputDir: './data'
+chains:
+    - 
+        skip: true
+        name: 'avax'
+        endpoint: "https://api.avax.network/ext/bc/C/rpc"
+        step: 1E5
+        tokens: 
+          -
+              name: "time"
+              tokenAddress: '0xb54f16fb19478766a268f172c9480f8da1a7c9c3'
+              stakeTokenAddress: '0x136acd46c134e8269052c62a67042d6bdedde3c9'
+              stakingAddress: '0x4456B87Af11e87E329AB7d7C7A246ed1aC2168B9'
+              startBlock: 3775251 
+              endBlock: 7690892
+              tokenAbi: "time.json"
+              stakedTokenAbi: "memo.json"
+              stakingAbi: "timeStaking.json"
+              step: 1E5
+              initialSupply: 30000
+              initialIndex: 4.547419269
+          -
+              name: "snowbank"
+              tokenAddress: '0x7d1232b90d3f809a54eeaeebc639c62df8a8942f'
+              stakeTokenAddress: '0xe9eb40d52ce4744322204d4a29af63c30f0260a4'
+              stakingAddress: '0x096BBfB78311227b805c968b070a81D358c13379'
+              startBlock: 6556240 
+              endBlock: 7690892
+              tokenAbi: "sb.json"
+              stakedTokenAbi: "ssb.json" 
+              stakingAbi: "ssbStaking.json"
+              initialSupply: 35453
+              initialIndex: 1
+    - 
+        name: 'fantom'
+        endpoint: "https://rpc.ftm.tools"
+        step: 1E5
+        tokens: 
+          -
+              name: "hector"
+              tokenAddress: '0x5C4FDfc5233f935f20D2aDbA572F770c2E377Ab0'
+              stakeTokenAddress: '0x75bdef24285013387a47775828bec90b91ca9a5f'
+              stakingAddress: '0xD12930C8deeDafD788F437879cbA1Ad1E3908Cc5'
+              startBlock: 20756632
+              endBlock: 23790712
+              tokenAbi: "hector.json"
+              stakedTokenAbi: "shector.json"
+              stakingAbi: "hectorStaking.json"
+              step: 1E5
+              initialSupply: 274655
+              initialIndex: 1.580730335 
+          -
+              name: "spartacus"
+              tokenAddress: '0x5602df4a94eb6c680190accfa2a475621e0ddbdc'
+              stakeTokenAddress: '0x8e2549225e21b1da105563d419d5689b80343e01'
+              stakingAddress: '0x9863056B4Bdb32160A70107a6797dD06B56E8137'
+              startBlock: 20636844
+              endBlock: 23790712
+              tokenAbi: "spartacus.json"
+              stakedTokenAbi: "sspartacus.json"
+              stakingAbi: "spartacusStaking.json"
+              step: 1E5
+              initialSupply: 43383.384648235
+              initialIndex: 7.67521082 

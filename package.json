@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "dependencies": {
+    "aws-sdk": "^2.809.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "oauth": "^0.9.15",
+    "twitter": "^1.7.1",
+    "twitter-api-v2": "^1.6.4",
+    "web3": "^1.3.0",
+    "xhr2": "^0.2.0",
+    "yaml": "^1.10.2"
+  }
+}
