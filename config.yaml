@@ -1,4 +1,4 @@
-abiDir: '/abi'
+abiDir: './abis'
 outputDir: './data'
 chains:
     - 
