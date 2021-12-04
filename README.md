@@ -3,6 +3,7 @@
 
 - node 14+
 - npm
+- a directory named 'data' in the directory where you run the code
 
 
 # Installation
