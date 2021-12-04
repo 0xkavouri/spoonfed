@@ -15,7 +15,7 @@
 # Config File Structure
 
 
-    ##chain:
+    ## chain:
     
         each chain requires the following fields to be set
         
@@ -29,7 +29,7 @@
         
             A list of forks to pull data for.
             
-        ##Each 'token' (fork) should have the following fields set:
+        ## Each 'token' (fork) should have the following fields set:
         
             ###tokenAddress
             address of the token contract
