@@ -55,9 +55,31 @@ used for calculations
 used for calculations. Necessary because some forks' index did not start at 1.
 
 ### bonds
-list of bond name/addresses for pulling bond data
-
-    - requires a name and contract address
-
+list of bond name/addresses for pulling bond data.
+requires a name and contract address
 
 
+
+# Example config for a new fork
+
+add this under the chain that the fork is on.
+
+             name: "fooooork"
+              tokenAddress: '<address>'
+              stakeTokenAddress: '<address>'
+              stakingAddress: '<address>'
+              bonds: 
+                -   
+                  name: 'bar'
+                  address: '<address of bond contract>'
+                -   
+                  name: 'foo'
+                  address: <address as a string>
+              startBlock: <number> 
+              endBlock: <number>
+              tokenAbi: "<path to json file w/ abi>"
+              stakedTokenAbi: "<path to json file w/ abi>"
+              stakingAbi: "<path to json file w/ abi>"
+              bondAbi: "<path to json file w/ abi>"
+              initialSupply: <number>
+              initialIndex: <number>
