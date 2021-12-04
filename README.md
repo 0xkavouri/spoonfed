@@ -19,9 +19,9 @@ node concave.js
     
 each chain requires the following fields to be set
 
-###name: chain name
-###endpoint: rpc url
-###step: how many blocks worth of data to request per call made to RPCs. 
+name: chain name
+endpoint: rpc url
+step: how many blocks worth of data to request per call made to RPCs. 
 - Applicable for things that grab historical data
 - higher value -> faster runtime. May cause timeouts though
 
@@ -31,27 +31,27 @@ A list of forks to pull data for.
 
 ## Each 'token' (fork) should have the following fields set:
 
-###tokenAddress
+### tokenAddress
 address of the token contract
 
-###stakeTokenAddress
+### stakeTokenAddress
 address of the staked token contract
 
-###stakingAddress
+### stakingAddress
 address of the contract that holds staked tokens
 
-###startBlock
+### startBlock
 block to start from when pulling historical data
-###endBlock
+### endBlock
 block to end pulling historical data from
 
-###Abi Fields
+### Abi Fields
 ABI json from the corresponding contract. Can get this from the block explorer
 
 ### initialSupply
 used for calculations
 
-###initialIndex
+### initialIndex
 used for calculations. Necessary because some forks' index did not start at 1.
 
 ### bonds
