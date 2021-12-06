@@ -6,12 +6,15 @@
 - a directory named 'data' in the directory where you run the code
 
 
-# Installation
+# Installation & Running
 
-npm install
+```bash
+docker-compose build spoonfed
+```
 
-node concave.js
-
+```bash
+docker-compose up spoonfed
+```
 
 # Config File Structure
 
@@ -84,3 +87,18 @@ add this under the chain that the fork is on.
               bondAbi: "<path to json file w/ abi>"
               initialSupply: <number>
               initialIndex: <number>
+
+# Todo
+- [ ] Get more metrics added to the list
+  - [X] Index
+  - [X] Supply
+  - [X] Growth
+  - [X] Dilution
+  - [X] StakedAmount
+  - [X] Rebase
+  - [X] APY
+  - [ ] ..
+- [ ] Fix $TIME
+  - [ ] APY
+  - [ ] Index
+- [ ] Add BONDS for chains
